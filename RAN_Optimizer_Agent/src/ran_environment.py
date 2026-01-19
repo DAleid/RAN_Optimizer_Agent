@@ -4,8 +4,12 @@ Supports both real data from CSV and simulated data modes
 """
 
 import numpy as np
-import gym
-from gym import spaces
+try:
+    import gymnasium as gym
+    from gymnasium import spaces
+except ImportError:
+    import gym
+    from gym import spaces
 from typing import Optional, Dict, List
 import os
 

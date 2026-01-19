@@ -10,6 +10,9 @@ langchain>=0.1.0
 langchain-groq>=0.0.1
 groq>=0.4.0
 
+# Environment (gymnasium replaces deprecated gym)
+gymnasium>=0.28.0
+
 # Visualization
 plotly>=5.3.0
 matplotlib>=3.4.0
