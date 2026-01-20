@@ -5,18 +5,15 @@ Each vendor's AI operates independently, creating potential conflicts
 """
 
 import numpy as np
-import gymnasium as gym
-from gymnasium import spaces
 
-class MultiVendorEnvironment(gym.Env):
+
+class MultiVendorEnvironment:
     """
     Simulates a multi-vendor RAN network
     Different cells belong to different vendors
     """
 
     def __init__(self, num_cells=12):
-        super(MultiVendorEnvironment, self).__init__()
-
         self.num_cells = num_cells
         self.current_step = 0
         self.max_steps = 100
@@ -24,14 +21,6 @@ class MultiVendorEnvironment(gym.Env):
         # Initialize cells with vendor assignment
         self.cells = []
         self._initialize_cells()
-
-        # Define observation and action spaces
-        self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf,
-            shape=(num_cells * 6,),
-            dtype=np.float32
-        )
-        self.action_space = spaces.Discrete(27)  # 3^3 actions
 
         # Track history for conflict detection
         self.history = []
