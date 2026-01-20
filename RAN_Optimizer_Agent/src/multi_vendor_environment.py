@@ -5,12 +5,8 @@ Each vendor's AI operates independently, creating potential conflicts
 """
 
 import numpy as np
-try:
-    import gymnasium as gym
-    from gymnasium import spaces
-except ImportError:
-    import gym
-    from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 
 class MultiVendorEnvironment(gym.Env):
     """
