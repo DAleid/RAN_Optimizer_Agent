@@ -7,12 +7,12 @@ import os
 from crewai import Agent
 from langchain_groq import ChatGroq
 
-def get_groq_llm(model_name: str = "groq/llama-3.1-70b-versatile"):
+def get_groq_llm(model_name: str = "groq/llama-3.3-70b-versatile"):
     """
     Initialize Groq LLM for the agents.
 
     Available Groq models:
-    - groq/llama-3.1-70b-versatile (recommended - best quality)
+    - groq/llama-3.3-70b-versatile (recommended - best quality)
     - groq/llama-3.1-8b-instant (faster, good for simple tasks)
     - groq/mixtral-8x7b-32768 (good balance)
     - groq/gemma2-9b-it (lightweight)
