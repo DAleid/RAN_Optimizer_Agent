@@ -13,10 +13,11 @@ print("="*60)
 print("\n1. Testing library imports...")
 try:
     import numpy as np
-    import torch
-    import gym
+    try:
+        import gymnasium as gym
+    except ImportError:
+        import gym
     print("   OK NumPy:", np.__version__)
-    print("   OK PyTorch:", torch.__version__)
     print("   OK Gym:", gym.__version__)
 except ImportError as e:
     print(f"   ERROR: {e}")
