@@ -4,18 +4,17 @@ Defines the 4 specialized agents for network optimization using CrewAI and Groq
 """
 
 import os
-from crewai import Agent
-from langchain_groq import ChatGroq
+from crewai import Agent, LLM
 
-def get_groq_llm(model_name: str = "llama-3.1-70b-versatile"):
+def get_groq_llm(model_name: str = "groq/llama-3.1-70b-versatile"):
     """
-    Initialize Groq LLM for the agents.
+    Initialize Groq LLM for the agents using CrewAI's native LLM class.
 
     Available Groq models:
-    - llama-3.1-70b-versatile (recommended - best quality)
-    - llama-3.1-8b-instant (faster, good for simple tasks)
-    - mixtral-8x7b-32768 (good balance)
-    - gemma2-9b-it (lightweight)
+    - groq/llama-3.1-70b-versatile (recommended - best quality)
+    - groq/llama-3.1-8b-instant (faster, good for simple tasks)
+    - groq/mixtral-8x7b-32768 (good balance)
+    - groq/gemma2-9b-it (lightweight)
     """
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
@@ -24,11 +23,11 @@ def get_groq_llm(model_name: str = "llama-3.1-70b-versatile"):
             "Get your free API key at: https://console.groq.com/keys"
         )
 
-    return ChatGroq(
+    # Use CrewAI's native LLM class with Groq provider
+    return LLM(
+        model=model_name,
         api_key=api_key,
-        model_name=model_name,
-        temperature=0.3,  # Lower temperature for more consistent outputs
-        max_tokens=2048
+        temperature=0.3
     )
 
 

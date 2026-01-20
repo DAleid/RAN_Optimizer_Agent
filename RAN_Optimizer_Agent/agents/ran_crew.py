@@ -48,7 +48,7 @@ class RANOptimizationCrew:
     4. Coordinator Agent - Makes final decisions
     """
 
-    def __init__(self, groq_api_key: Optional[str] = None, model_name: str = "llama-3.1-70b-versatile"):
+    def __init__(self, groq_api_key: Optional[str] = None, model_name: str = "groq/llama-3.1-70b-versatile"):
         """
         Initialize the RAN Optimization Crew.
 

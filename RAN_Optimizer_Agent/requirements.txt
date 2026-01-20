@@ -5,10 +5,9 @@ numpy>=1.21.0,<2.0.0
 pandas>=1.3.0
 
 # AI Agents Framework
-crewai>=0.28.0
-langchain>=0.1.0
-langchain-groq>=0.0.1
-groq>=0.4.0
+crewai>=0.80.0
+crewai-tools>=0.14.0
+litellm>=1.40.0
 
 # Environment (gymnasium replaces deprecated gym)
 gymnasium>=0.28.0
