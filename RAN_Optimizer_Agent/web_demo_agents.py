@@ -92,6 +92,27 @@ if 'api_key_set' not in st.session_state:
     st.session_state.api_key_set = False
 
 
+def initialize_api_key():
+    """Initialize Groq API key from Streamlit secrets or environment"""
+    api_key = None
+
+    # Try to get from Streamlit secrets first (for Streamlit Cloud)
+    try:
+        api_key = st.secrets["GROQ_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        pass
+
+    # Fallback to environment variable
+    if not api_key:
+        api_key = os.getenv("GROQ_API_KEY")
+
+    if api_key:
+        os.environ["GROQ_API_KEY"] = api_key
+        return api_key
+
+    return None
+
+
 def create_agent_cards():
     """Display agent information cards"""
     agents_info = {
@@ -372,12 +393,39 @@ def main():
     st.markdown('<h1 class="main-header">🤖 AI Agents for RAN Network Optimization</h1>', unsafe_allow_html=True)
     st.markdown("### Multi-Agent System powered by CrewAI & Groq")
 
+    # Auto-initialize API key from secrets
+    if not st.session_state.api_key_set:
+        api_key = initialize_api_key()
+        if api_key:
+            try:
+                from agents.ran_crew import RANOptimizationCrew
+                st.session_state.crew = RANOptimizationCrew(groq_api_key=api_key)
+                st.session_state.api_key_set = st.session_state.crew.is_ready()
+            except Exception as e:
+                st.error(f"Error initializing agents: {e}")
+
+    # Show error if no API key found
+    if not st.session_state.api_key_set:
+        st.error("⚠️ GROQ_API_KEY not found! Please add it to Streamlit Cloud Secrets.")
+        st.markdown("""
+        ### Setup Instructions:
+        1. Go to your Streamlit Cloud dashboard
+        2. Click on your app settings
+        3. Navigate to **Secrets**
+        4. Add the following:
+        ```toml
+        GROQ_API_KEY = "gsk_your_api_key_here"
+        ```
+        5. Save and reboot the app
+        """)
+        return
+
     # Sidebar
     st.sidebar.header("⚙️ Configuration")
 
     page = st.sidebar.radio(
         "Navigation",
-        ["🏠 Overview", "🔑 Setup API Key", "🎯 Run Optimization", "📊 Results Analysis"]
+        ["🏠 Overview", "🎯 Run Optimization", "📊 Results Analysis"]
     )
 
     st.sidebar.markdown("---")
@@ -469,81 +517,9 @@ def main():
             - **Free Tier Available**: Get started with Groq's free API
             """)
 
-    # ============= PAGE: SETUP API KEY =============
-    elif page == "🔑 Setup API Key":
-        st.header("Setup Groq API Key")
-
-        st.markdown("""
-        This application uses **Groq** for fast LLM inference. Groq offers a generous free tier.
-
-        ### Get Your Free API Key:
-        1. Go to [console.groq.com](https://console.groq.com)
-        2. Sign up for a free account
-        3. Navigate to "API Keys"
-        4. Create a new API key
-        5. Paste it below
-        """)
-
-        api_key = st.text_input(
-            "Enter your Groq API Key",
-            type="password",
-            placeholder="gsk_xxxxxxxxxxxxxxxxxxxx"
-        )
-
-        if st.button("✅ Save API Key"):
-            if api_key and api_key.startswith("gsk_"):
-                os.environ["GROQ_API_KEY"] = api_key
-                st.session_state.api_key_set = True
-
-                # Initialize the crew
-                try:
-                    from agents.ran_crew import RANOptimizationCrew
-                    st.session_state.crew = RANOptimizationCrew(groq_api_key=api_key)
-
-                    if st.session_state.crew.is_ready():
-                        st.success("✅ API Key saved and agents initialized!")
-                        st.balloons()
-                    else:
-                        st.error("Failed to initialize agents")
-                except Exception as e:
-                    st.error(f"Error initializing agents: {e}")
-            else:
-                st.error("Please enter a valid Groq API key (starts with 'gsk_')")
-
-        if st.session_state.api_key_set:
-            st.success("✅ API Key is configured!")
-
-        st.markdown("---")
-
-        st.markdown("""
-        ### For Streamlit Cloud Deployment
-
-        Add your API key to **Secrets** in the Streamlit Cloud dashboard:
-
-        ```toml
-        GROQ_API_KEY = "gsk_your_api_key_here"
-        ```
-        """)
-
-        # Check if key is in environment (for Streamlit Cloud)
-        if os.getenv("GROQ_API_KEY"):
-            st.info("🔐 GROQ_API_KEY found in environment variables")
-            if not st.session_state.api_key_set:
-                try:
-                    from agents.ran_crew import RANOptimizationCrew
-                    st.session_state.crew = RANOptimizationCrew()
-                    st.session_state.api_key_set = st.session_state.crew.is_ready()
-                except Exception as e:
-                    st.error(f"Error: {e}")
-
     # ============= PAGE: RUN OPTIMIZATION =============
     elif page == "🎯 Run Optimization":
         st.header("Run Network Optimization")
-
-        if not st.session_state.api_key_set:
-            st.warning("⚠️ Please configure your Groq API key first!")
-            st.page_link("🔑 Setup API Key", label="Go to Setup")
-            return
 
         # Initialize environment
         if st.session_state.env is None or st.button("🔄 Reset Network"):
